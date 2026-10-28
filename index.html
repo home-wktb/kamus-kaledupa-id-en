@@ -26,200 +26,218 @@
             margin: 10px 0;
             border: 1px solid #ccc;
             border-radius: 5px;
+            box-sizing: border-box; /* Agar padding tidak melebarkan kotak */
         }
         button {
             background-color: #007bff;
             color: white;
             border: none;
             cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
         }
         button:hover {
             background-color: #0056b3;
         }
         .result {
             margin-top: 20px;
-            font-size: 18px;
+            font-size: 16px;
+            text-align: left; /* Teks hasil rata kiri agar rapi */
         }
         .header {
             background: #007bff;
             color: white;
             padding: 15px;
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-direction: column;
+            border-radius: 5px;
         }
         .header img {
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             margin-bottom: 10px;
+            border-radius: 50%;
+        }
+        .header-sub {
+            font-size: 14px;
+            font-weight: normal;
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <img src="newlokas.png" alt="Logo Kamus">
+            <!-- Ganti 'newlokas.png' jika nama file gambar Anda berbeda -->
+            <img src="newlokas.png" alt="Logo Kamus" onerror="this.style.display='none'">
             <div>Kamus 3 Bahasa</div>
-            <div>Bahasa Kaledupa - Bahasa Indonesia - Bahasa Inggris</div>
+            <div class="header-sub">Bahasa Kaledupa - Bahasa Indonesia - Bahasa Inggris</div>
         </div>
-        <input type="text" id="wordInput" placeholder="Masukkan kata dalam salah satu bahasa...">
+        
+        <input type="text" id="wordInput" placeholder="Masukkan kata dalam salah satu bahasa..." onkeypress="if(event.key === 'Enter') translateWord()">
         <button onclick="translateWord()">Terjemahkan</button>
+        
         <div class="result" id="translationResult"></div>
     </div>
 
     <script>
         const dictionary = {
-            "air": { "kaledupa": "tee", "indonesia": "air", "english": "water", "example": {"kaledupa": "Ia morou tee.", "indonesia": "Dia minum air.", "english": "He drinks water."} },
-            "saya": {"kaledupa": "yaku, ku", "indonesia": "Saya","english": "I","example": { "kaledupa": "yaku la joko","indonesia": "saya joko","english": "I'm joko" }},
-            "rumah": { "kaledupa": "sapo","indonesia": "Rumah","english": "House","example": {  "kaledupa": "te sapo ye'e na ana",  "indonesia": "ini rumah siapa",  "english": "whose house is this?"} },
-	    "makan": { "kaledupa": "manga", "indonesia": "makan", "english": "eat", "example": {"kaledupa": "Ia manga te daporo.", "indonesia": "Dia makan di dapur.", "english": "He eats in the kitchen."} },
             "adik": { "kaledupa": "iyai", "indonesia": "adik", "english": "younger sibling", "example": {"kaledupa": "iyai moane", "indonesia": "adik laki-laki", "english": "younger brother"} },
-            "apa": {"kaledupa": "paira","indonesia": "Apa","english": "What","example": {"kaledupa": "te paira na ana","indonesia": "apa ini","english": "what is this?"} },
-	    "ambil": { "kaledupa": "ala e", "indonesia": "ambil", "english": "take", "example": {"kaledupa": "ala e bokussu", "indonesia": "ambil bukuku", "english": "take my book"} },
-            "ayah": { "kaledupa": "bapa", "indonesia": "ayah", "english": "father", "example": { "kaledupa": "bapa karajaa", "indonesia": "ayah bekerja", "english": "father is working" } },
-	    "baca": { "kaledupa": "basa", "indonesia": "baca", "english": "read", "example": { "kaledupa": "ia no basa te surat", "indonesia": "dia baca surat", "english": "he/she reads a letter" } },
-	    "bagaimana": { "kaledupa": "toumpa", "indonesia": "bagaimana", "english": "how", "example": { "kaledupa": "toumpa na nguru u?", "indonesia": "bagaimana kabarmu?", "english": "how are you?" } },
-	    "bangun": { "kaledupa": "bangu", "indonesia": "bangun", "english": "wake up / build", "example": { "kaledupa": "ikoo bangu rea-rea", "indonesia": "kamu bangun pagi", "english": "you wake up early" } },
-	    "bekerja": { "kaledupa": "karajaa", "indonesia": "bekerja", "english": "work", "example": { "kaledupa": "ikami karajaa dhi kantoro", "indonesia": "kami bekerja di kantor", "english": "we work at the office" } },
-	    "belajar": { "kaledupa": "hena-henai", "indonesia": "belajar", "english": "study", "example": { "kaledupa": "te ammai hena-henai dhi sikolaa", "indonesia": "mereka belajar di sekolah", "english": "they study at school" } },
-	    "beli": { "kaledupa": "bhalu", "indonesia": "beli", "english": "buy", "example": { "kaledupa": "mama bhalu te sayuro", "indonesia": "ibu beli sayur", "english": "mother buys vegetables" } },
-	    "berapa": { "kaledupa": "sapaira", "indonesia": "berapa", "english": "how many / how much", "example": { "kaledupa": "sapaira na hargano na ana", "indonesia": "berapa harganya ini", "english": "how much is this?" } },
-	    "berdiri": { "kaledupa": "tadhe", "indonesia": "berdiri", "english": "stand", "example": { "kaledupa": "te ia no tadhe dhi aro", "indonesia": "dia berdiri di depan", "english": "he/she stands in front" } },
-	    "bicara": { "kaledupa": "bisara", "indonesia": "bicara", "english": "talk", "example": { "kaledupa": "alimo barhu bisara tooge", "indonesia": "jangan bicara keras", "english": "don't talk loudly" } },
-	    "bisa": { "kaledupa": "pooli", "indonesia": "bisa", "english": "can", "example": { "kaledupa": "yaku pooli nu mangu", "indonesia": "saya bisa berenang", "english": "i can swim" } },
-	    "buka": { "kaledupa": "leka", "indonesia": "buka", "english": "open", "example": { "kaledupa": "leka e na eloppo!", "indonesia": "buka pintu!", "english": "open the door!" } },
-	    "buku": { "kaledupa": "boku", "indonesia": "buku", "english": "book", "example": { "kaledupa": "te boku fo ou", "indonesia": "buku baru", "english": "new book" } },
-	    "bulan": { "kaledupa": "komba", "indonesia": "bulan", "english": "month", "example": { "kaledupa": "komba ompulu lolima", "indonesia": "bulan purnama", "english": "full moon" } },
-	    "cari": { "kaledupa": "laha", "indonesia": "cari", "english": "search", "example": { "kaledupa": "yaku laha t ufa", "indonesia": "saya cari uang", "english": "i search for money" } },
-	    "cuci": { "kaledupa": "fufu i", "indonesia": "cuci", "english": "wash", "example": { "kaledupa": "te iyai no fufu i te pakaia", "indonesia": "adik cuci pakaian", "english": "younger sibling washes clothes" } },
-	    "dapur": { "kaledupa": "daporo", "indonesia": "dapur", "english": "kitchen", "example": { "kaledupa": "te fa mama dhi daporo", "indonesia": "ibu di dapur", "english": "mother is in the kitchen" } },
-	    "datang": { "kaledupa": "mai", "indonesia": "datang", "english": "come", "example": { "kaledupa": "ia no mai dhi nga fi", "indonesia": "dia datang kemari", "english": "he/she comes here" } },
-	    "dia": { "kaledupa": "ia", "indonesia": "dia", "english": "he/she", "example": { "kaledupa": "te ia no poilukko", "indonesia": "dia suka kamu", "english": "he/she likes you" } },
-	    "duduk": { "kaledupa": "kedheng-khede", "indonesia": "duduk", "english": "sit", "example": { "kaledupa": "kedhe dhi kurusi", "indonesia": "silakan duduk di kursi", "english": "please sit on the chair" } },
-	    "hari": { "kaledupa": "moina", "indonesia": "hari", "english": "day", "example": { "kaledupa": "moina cerah", "indonesia": "hari cerah", "english": "sunny day" } },
-	    "harus": { "kaledupa": "tabhea", "indonesia": "harus", "english": "must", "example": { "kaledupa": "ikoo tabhea ko hena-henai", "indonesia": "kamu harus belajar", "english": "you must study" } },
-	    "hidung": { "kaledupa": "bhobho", "indonesia": "hidung", "english": "nose", "example": { "kaledupa": "bhobho mentui", "indonesia": "hidung mancung", "english": "pointed nose" } },
-	    "ibu": { "kaledupa": "mama", "indonesia": "ibu", "english": "mother", "example": { "kaledupa": "fa mama hetaahu", "indonesia": "ibu masak", "english": "mother cooks" } },
-	    "ingin": { "kaledupa": "hadha", "indonesia": "ingin", "english": "want", "example": { "kaledupa": "yaku hadha manga", "indonesia": "saya ingin makan", "english": "i want to eat" } },
-	     "jalan": { "kaledupa": "fila", "indonesia": "jalan", "english": "road / walk", "example": { "kaledupa": "ikita fila asa-asa", "indonesia": "kita jalan bersama", "english": "we walk together" } },
-	  "jam": { "kaledupa": "rambi", "indonesia": "jam", "english": "hour", "example": { "kaledupa": "rambi lolima", "indonesia": "jam lima", "english": "five o'clock" } },
-	  "jendela": { "kaledupa": "kabhalo bhalo", "indonesia": "jendela", "english": "window", "example": { "kaledupa": "bantoe na kabhalo bhalo", "indonesia": "tutup jendela", "english": "close the window" } },
-	  "jual": { "kaledupa": "paraaso", "indonesia": "jual", "english": "sell", "example": { "kaledupa": "la bapa no paraaso te motoro", "indonesia": "ayah jual motor", "english": "father sells a motorcycle" } },
-	  "kakak": { "kaledupa": "ikakaa", "indonesia": "kakak", "english": "older sibling", "example": { "kaledupa": "ikakaa fofine", "indonesia": "kakak perempuan", "english": "older sister" } },
-	  "kakek": { "kaledupa": "ompu moane", "indonesia": "kakek", "english": "grandfather", "example": { "kaledupa": "ompu moane moturu", "indonesia": "kakek tidur", "english": "grandfather is sleeping" } },
-	  "kaki": { "kaledupa": "ae", "indonesia": "kaki", "english": "leg", "example": { "kaledupa": "ae mo hii", "indonesia": "kaki kiri", "english": "left leg" } },
-	  "kamar": { "kaledupa": "kamara", "indonesia": "kamar", "english": "room", "example": { "kaledupa": "kamara moturu tooge", "indonesia": "kamar tidur besar", "english": "big bedroom" } },
-	  "kamar mandi": { "kaledupa": "kammara hesofui", "indonesia": "kamar mandi", "english": "bathroom", "example": { "kaledupa": "kammara hesofui barasii", "indonesia": "kamar mandi bersih", "english": "clean bathroom" } },
-	  "kami": { "kaledupa": "ikami", "indonesia": "kami", "english": "we (inclusive)", "example": { "kaledupa": "ikami ko mangamo", "indonesia": "kami sudah makan", "english": "we have eaten" } },
-	  "kamu": { "kaledupa": "ikoo, ko", "indonesia": "kamu", "english": "you", "example": { "kaledupa": "ikoo te yee", "indonesia": "kamu siapa", "english": "who are you?" } },
-	  "kantor": { "kaledupa": "te kantoro", "indonesia": "kantor", "english": "office", "example": { "kaledupa": "te kantoro no tutu", "indonesia": "kantor tutup", "english": "the office is closed" } },
-	  "kapan": { "kaledupa": "kehia", "indonesia": "kapan", "english": "when", "example": { "kaledupa": "kehia ko kumafi", "indonesia": "kapan kamu menikah", "english": "when will you get married?" } },
-	  "kasur": { "kaledupa": "kasoro", "indonesia": "kasur", "english": "mattress", "example": { "kaledupa": "kasoro fo ou", "indonesia": "kasur baru", "english": "new mattress" } },
-	  "keluarga": { "kaledupa": "tuha", "indonesia": "keluarga", "english": "family", "example": { "kaledupa": "te santuha", "indonesia": "keluarga besar", "english": "big family" } },
-	  "kepala": { "kaledupa": "kapala", "indonesia": "kepala", "english": "head", "example": { "kaledupa": "kiki'i na kapala", "indonesia": "kepala sakit", "english": "headache" } },
-	  "kirim": { "kaledupa": "kahu", "indonesia": "kirim", "english": "send", "example": { "kaledupa": "kahue na sura ana", "indonesia": "kirim surat ini", "english": "send this letter" } },
-	  "kita": { "kaledupa": "ikita", "indonesia": "kita", "english": "we (exclusive)", "example": { "kaledupa": "mai to inte to manga", "indonesia": "ayo kita pergi makan", "english": "let's go eat" } },
-	  "komputer": { "kaledupa": "komputere", "indonesia": "komputer", "english": "computer", "example": { "kaledupa": "komputere no dhao", "indonesia": "komputer rusak", "english": "the computer is broken" } },
-	  "kursi": { "kaledupa": "kurusi", "indonesia": "kursi", "english": "chair", "example": { "kaledupa": "kedhe dhi kurusi", "indonesia": "silahkan duduk di kursi", "english": "please sit on the chair" } },
-	  "lampu": { "kaledupa": "pajamara", "indonesia": "lampu", "english": "lamp", "example": { "kaledupa": "nokata na pajamara", "indonesia": "nyalakan lampu", "english": "turn on the lamp" } },
-	  "lari": { "kaledupa": "tinti", "indonesia": "lari", "english": "run", "example": { "kaledupa": "ikoo utinti melassa", "indonesia": "kamu lari cepat", "english": "you run fast" } },
-	  "main": { "kaledupa": "aka-aka", "indonesia": "main", "english": "play", "example": { "kaledupa": "dhai dana aka-aka dhi liku", "indonesia": "anak-anak main di luar", "english": "children play outside" } },
-	  "makanan": { "kaledupa": "manga", "indonesia": "makanan", "english": "food", "example": { "kaledupa": "manga minna", "indonesia": "makanan enak", "english": "delicious food" } },
-	  "malam": { "kaledupa": "utu", "indonesia": "malam", "english": "night", "example": { "kaledupa": "te utu kumengku", "indonesia": "malam dingin", "english": "cold night" } },
-	  "mana": { "kaledupa": "kaumpa", "indonesia": "mana", "english": "where", "example": { "kaledupa": "ikoo diumpa", "indonesia": "kamu dimana", "english": "where are you?" } },
-	  "masak": { "kaledupa": "hetaahu", "indonesia": "masak", "english": "cook", "example": { "kaledupa": "ikakaa hetaahu te nasi", "indonesia": "kakak masak nasi", "english": "sister cooks rice" } },
-	  "mata": { "kaledupa": "mata", "indonesia": "mata", "english": "eye", "example": { "kaledupa": "mata leama, mata mangadha", "indonesia": "mata indah", "english": "beautiful eyes" } },
-	  "mau": { "kaledupa": "hadha", "indonesia": "mau", "english": "want", "example": { "kaledupa": "yaku hadha manga", "indonesia": "saya mau makan", "english": "i want to eat" } },
-	  "meja": { "kaledupa": "meja", "indonesia": "meja", "english": "table", "example": { "kaledupa": "meja dhi te kantoro", "indonesia": "meja di kantor", "english": "the table is in the office" } },
-	  "mengapa": { "kaledupa": "noha a", "indonesia": "mengapa", "english": "why", "example": { "kaledupa": "noha a fadhia u inte?", "indonesia": "mengapa kamu pergi?", "english": "why did you go?" } },
-	  "menit": { "kaledupa": "manii", "indonesia": "menit", "english": "minute", "example": { "kaledupa": "lima monitti", "indonesia": "lima menit", "english": "five minutes" } },
-	  "mereka": { "kaledupa": "te ammai", "indonesia": "mereka", "english": "they", "example": { "kaledupa": "te ammai inte dha dhaoa", "indonesia": "mereka pergi ke pasar", "english": "they went to the market" } },
-	  "minum": { "kaledupa": "morou", "indonesia": "minum", "english": "drink", "example": { "kaledupa": "ikoo umorou te paira?", "indonesia": "kamu minum apa?", "english": "what are you drinking?" } },
-	  "minuman": { "kaledupa": "morou", "indonesia": "minuman", "english": "drink (beverage)", "example": { "kaledupa": "te morou kumengku", "indonesia": "minuman dingin", "english": "cold drink" } },
-	  "mobil": { "kaledupa": "oto", "indonesia": "mobil", "english": "car", "example": { "kaledupa": "mai to ekka dhi oto", "indonesia": "ayo kita naik mobil", "english": "let's take the car" } },
-	  "motor": { "kaledupa": "motoro", "indonesia": "motor", "english": "motorcycle", "example": { "kaledupa": "motoro la bapa", "indonesia": "motor ayah", "english": "father's motorcycle" } },
-	  "nenek": { "kaledupa": "ompu fofine", "indonesia": "nenek", "english": "grandmother", "example": { "kaledupa": "ompu fofine no tula-tula", "indonesia": "nenek bercerita", "english": "grandmother is telling a story" } },
-	  "obat": { "kaledupa": "kombi", "indonesia": "obat", "english": "medicine", "example": { "kaledupa": "kombi manjuru", "indonesia": "obat mujarab", "english": "effective medicine" } },
-	  "pagi": { "kaledupa": "rea-rea", "indonesia": "pagi", "english": "morning", "example": { "kaledupa": "dhi rea-rea", "indonesia": "pagi hari", "english": "morning time" } },
-	  "pakai": { "kaledupa": "pake", "indonesia": "pakai", "english": "wear", "example": { "kaledupa": "yaku pake sapatu", "indonesia": "saya pakai sepatu", "english": "i wear shoes" } },
-	  "pakaian": { "kaledupa": "pakaia", "indonesia": "pakaian", "english": "clothes", "example": { "kaledupa": "pakea leama", "indonesia": "pakaian bagus", "english": "nice clothes" } },
-	  "panggil": { "kaledupa": "ello", "indonesia": "panggil", "english": "call", "example": { "kaledupa": "ello na dottoro", "indonesia": "panggil dokter!", "english": "call the doctor!" } },
-	  "pasar": { "kaledupa": "dhaoa", "indonesia": "pasar", "english": "market", "example": { "kaledupa": "inte dha dhaoa", "indonesia": "pergi ke pasar", "english": "go to the market" } },
-	  "pergi": { "kaledupa": "inte", "indonesia": "pergi", "english": "go", "example": { "kaledupa": "yaku inte dha sikolaa", "indonesia": "saya pergi ke sekolah", "english": "i go to school" } },
-	  "perlu": { "kaledupa": "faralu", "indonesia": "perlu", "english": "need", "example": { "kaledupa": "ikita to faralu te ufa", "indonesia": "kita perlu uang", "english": "we need money" } },
-	  "pintu": { "kaledupa": "eloppo", "indonesia": "pintu", "english": "door", "example": { "kaledupa": "eloppo sapo merah", "indonesia": "pintu rumah merah", "english": "the door of the red house" } },
-	  "pulpen": { "kaledupa": "folopena", "indonesia": "pulpen", "english": "pen", "example": { "kaledupa": "folopena no tokkabhi", "indonesia": "pulpen hilang", "english": "the pen is lost" } },
-	  "saudara": { "kaledupa": "te tuha", "indonesia": "saudara", "english": "sibling", "example": { "kaledupa": "te tuha moane", "indonesia": "saudara laki-laki", "english": "male sibling" } },
-	   "sekolah": { "kaledupa": "sikolaa", "indonesia": "sekolah", "english": "school", "example": { "kaledupa": "sikolaa mellai", "indonesia": "sekolah jauh", "english": "the school is far" } },
-	  "sepatu": { "kaledupa": "sapatu", "indonesia": "sepatu", "english": "shoes", "example": { "kaledupa": "te sapatussu rafna bhiru", "indonesia": "sepatuku warna hitam", "english": "my shoes are black" } },
-	  "sepeda": { "kaledupa": "supeda", "indonesia": "sepeda", "english": "bicycle", "example": { "kaledupa": "supeda foou", "indonesia": "sepeda baru", "english": "new bicycle" } },
-	  "siang": { "kaledupa": "tobelenu oloo", "indonesia": "siang", "english": "afternoon", "example": { "kaledupa": "tobelenu oloo", "indonesia": "siang panas", "english": "hot afternoon" } },
-	  "siapa": { "kaledupa": "ye e", "indonesia": "siapa", "english": "who", "example": { "kaledupa": "ye e na ngaa u", "indonesia": "siapa namamu", "english": "what is your name?" } },
-	  "tahun": { "kaledupa": "tao", "indonesia": "tahun", "english": "year", "example": { "kaledupa": "tao foou", "indonesia": "tahun baru", "english": "new year" } },
-	  "tangan": { "kaledupa": "lima", "indonesia": "tangan", "english": "hand", "example": { "kaledupa": "lima moana", "indonesia": "tangan kanan", "english": "right hand" } },
-	  "tanggal": { "kaledupa": "tanggala", "indonesia": "tanggal", "english": "date", "example": { "kaledupa": "tanggala popia ?", "indonesia": "tanggal berapa?", "english": "what date?" } },
-	  "tas": { "kaledupa": "tas", "indonesia": "tas", "english": "bag", "example": { "kaledupa": "tasi fa mama", "indonesia": "tas ibu", "english": "mother's bag" } },
-	  "telepon": { "kaledupa": "talipo", "indonesia": "telepon", "english": "phone", "example": { "kaledupa": "talipo notanga", "indonesia": "telepon berdering", "english": "the phone is ringing" } },
-	  "telinga": { "kaledupa": "talinga", "indonesia": "telinga", "english": "ear", "example": { "kaledupa": "talinga no rodhongo", "indonesia": "telinga mendengar", "english": "the ear listens" } },
-	  "tidur": { "kaledupa": "moturu", "indonesia": "tidur", "english": "sleep", "example": { "kaledupa": "yaku moturu dhi kasoro", "indonesia": "saya tidur di kasur", "english": "i sleep on the mattress" } },
-	  "toko": { "kaledupa": "te toko", "indonesia": "toko", "english": "store", "example": { "kaledupa": "te toko no leka", "indonesia": "toko buka", "english": "the store is open" } },
-	  "tulis": { "kaledupa": "buri", "indonesia": "tulis", "english": "write", "example": { "kaledupa": "yaku buri te boku", "indonesia": "saya tulis buku", "english": "i write a book" } },
-	  "tutup": { "kaledupa": "banto", "indonesia": "tutup", "english": "close", "example": { "kaledupa": "bantoe na kabhalo bhalo", "indonesia": "tutup jendela", "english": "close the window" } },
-	  "uang": { "kaledupa": "ufa", "indonesia": "uang", "english": "money", "example": { "kaledupa": "ufa nodhai", "indonesia": "uang cukup", "english": "enough money" } },
-	  "waktu": { "kaledupa": "fakutuu", "indonesia": "waktu", "english": "time", "example": { "kaledupa": "fakutuu fila torusu", "indonesia": "waktu berjalan", "english": "time moves forward" } },
-	  "cinta": { "kaledupa": "poilu", "indonesia": "cinta", "english": "love", "example": { "kaledupa": "yaku ku poilukko", "indonesia": "saya cinta kamu", "english": "i love you" } },
-	   "mulut": {"indonesia": "mulut", "kaledupa": "ngusu", "english": "mouth", "example": {"indonesia": "dia menutup mulutnya.", "kaledupa": "no bantoe na ngusu-no.", "english": "he closed his mouth."}},
-	  "sapi": {"indonesia": "sapi", "kaledupa": "te sapi", "english": "cow", "example": {"indonesia": "sapi itu besar.", "kaledupa": "te sapi itu deka.", "english": "that cow is big."}},
-	  "ikan": {"indonesia": "ikan", "kaledupa": "te kenta", "english": "fish", "example": {"indonesia": "aku menangkap ikan.", "kaledupa": "yaku afa te kenta.", "english": "i caught a fish."}},
-	  "ular": {"indonesia": "ular", "kaledupa": "te saa", "english": "snake", "example": {"indonesia": "ada ular di kebun.", "kaledupa": "anne na saa di kollo.", "english": "there is a snake in the garden."}},
-	  "kupu-kupu": {"indonesia": "kupu-kupu", "kaledupa": "loma", "english": "butterfly", "example": {"indonesia": "kupu-kupu itu cantik.", "kaledupa": "loma iso mokossa.", "english": "the butterfly is beautiful."}},
-	  "telur": {"indonesia": "telur", "kaledupa": "gorau", "english": "egg", "example": {"indonesia": "ayam bertelur di sarang.", "kaledupa": "te manu manggorau di saranga.", "english": "the hen lays eggs in the nest."}},
-	  "sayur": {"indonesia": "sayur", "kaledupa": "sayoro", "english": "vegetable", "example": {"indonesia": "saya makan sayur hijau.", "kaledupa": "yaku manga sayoro ndanggo.", "english": "i eat green vegetables."}},
-	  "seribu": {"indonesia": "seribu", "kaledupa": "sarifu", "english": "one thousand", "example": {"indonesia": "harga barang itu seribu rupiah.", "kaledupa": "te hargana barang iso sarifu rupia.", "english": "the price of that item is one thousand rupiahs."}},
-	  "dua ribu": {"indonesia": "dua ribu", "kaledupa": "dua rifu", "english": "two thousand", "example": {"indonesia": "dia membayar dua ribu rupiah.", "kaledupa": "no afia dua rifu rupia.", "english": "he paid two thousand rupiahs."}},
-	  "tiga ribu": {"indonesia": "tiga ribu", "kaledupa": "tolu rifu", "english": "three thousand", "example": {"indonesia": "tiga ribu cukup untuk membeli kopi.", "kaledupa": "tolu rifu afe morou te kopi.", "english": "three thousand is enough to buy coffee."}},
-	  "satu juta": {"indonesia": "satu juta", "kaledupa": "sajuta", "english": "one million", "example": {"indonesia": "hadiah itu bernilai satu juta rupiah.", "kaledupa": "te hadia iso sajuta rupia.", "english": "that prize is worth one million rupiahs."}},
-	  "daging": {"indonesia": "daging", "kaledupa": "te dagi", "english": "meat", "example": {"indonesia": "saya memasak daging sapi.", "kaledupa": "yaku manga te dagi sapi.", "english": "i cook beef."}},
-	  "sholat": {"indonesia": "sholat", "kaledupa": "sambahea", "english": "prayer", "example": {"indonesia": "dia sholat lima waktu.", "kaledupa": "no sambahea lima kali.", "english": "he prays five times a day."}},
-	  "cerita-cerita": {"indonesia": "cerita-cerita", "kaledupa": "palaenga", "english": "stories", "example": {"indonesia": "kakek suka cerita-cerita.", "kaledupa": "te yai suka palaenga.", "english": "grandfather likes to tell stories."}},
-	  "rokok": {"indonesia": "rokok", "kaledupa": "tabako", "english": "cigarette", "example": {"indonesia": "dia membeli rokok.", "kaledupa": "no afa tabako.", "english": "he bought a cigarette."}},
-	  "kopi": {"indonesia": "kopi", "kaledupa": "te kopi", "english": "coffee", "example": {"indonesia": "saya minum kopi pagi ini.", "kaledupa": "yaku morou te kopi iso madaha.", "english": "i drank coffee this morning."}},
-	  "asap": {"indonesia": "asap", "kaledupa": "ko o", "english": "smoke", "example": {"indonesia": "asap naik ke udara.", "kaledupa": "ko o a'e ko awanga.", "english": "the smoke rises into the air."}},
-	  "api": {"indonesia": "api", "kaledupa": "te ahu", "english": "fire", "example": {"indonesia": "api itu menyala.", "kaledupa": "te ahu itu mantana.", "english": "the fire is burning."}},
-	  "korek": {"indonesia": "korek", "kaledupa": "te colo", "english": "match", "example": {"indonesia": "saya menyalakan korek.", "kaledupa": "yaku pakata te colo.", "english": "i lit a match."}},
-          "bulu": { "kaledupa": "fulu", "indonesia": "bulu", "english": "feather", "example": { "kaledupa": "fulu no paka nomelangka", "indonesia": "bulunya tidak panjang", "english": "the feather isn’t long" }},
-	  "kuku": { "kaledupa": "kuku", "indonesia": "kuku", "english": "nail", "example": { "kaledupa": "kuku no barasii", "indonesia": "kukunya bersih", "english": "the nail is clean" }},
-	  "lutut": { "kaledupa": "tu'u", "indonesia": "lutut", "english": "knee", "example": { "kaledupa": "tu'u ana kikii", "indonesia": "lutut ini sakit", "english": "this knee hurts" }},
-	  "tumit": { "kaledupa": "tuno", "indonesia": "tumit", "english": "heel", "example": { "kaledupa": "tuno ana notokkuli", "indonesia": "tumit ini lecet", "english": "this heel is scraped" }},
-	  "ibu jari": { "kaledupa": "fungan tooge", "indonesia": "ibu jari", "english": "thumb", "example": { "kaledupa": "fungan tooge no tooge", "indonesia": "ibu jari ini besar", "english": "this thumb is big" }},
-	  "jari telunjuk": { "kaledupa": "funga sinnua", "indonesia": "jari telunjuk", "english": "index finger", "example": { "kaledupa": "funga sinnua melangka", "indonesia": "jari telunjuk ini panjang", "english": "this index finger is long" }},
-	  "jari tengah": { "kaledupa": "fungan tonga", "indonesia": "jari tengah", "english": "middle finger", "example": { "kaledupa": "fungan tonga nomobela", "indonesia": "jari tengah ini luka", "english": "this middle finger is wounded" }},
-	  "jari manis": { "kaledupa": "funga kela", "indonesia": "jari manis", "english": "ring finger", "example": { "kaledupa": "funga kela umalusu", "indonesia": "jari manis ini halus", "english": "this ring finger is smooth" }},
-	  "jari kelingking": { "kaledupa": "fungansili", "indonesia": "jari kelingking", "english": "pinky finger", "example": { "kaledupa": "fungansili bahili", "indonesia": "jari kelingking ini kecil", "english": "this pinky is small" }},
-	  "jenggot": { "kaledupa": "janggu", "indonesia": "jenggot", "english": "beard", "example": { "kaledupa": "janggu melangka", "indonesia": "jenggotnya panjang", "english": "the beard is long" }},
-	  "kumis": { "kaledupa": "kummisi", "indonesia": "kumis", "english": "mustache", "example": { "kaledupa": "kummisi monihi", "indonesia": "kumisnya tipis", "english": "the mustache is thin" }},
-	  "sholat": { "kaledupa": "smbahea", "indonesia": "sholat", "english": "prayer", "example": { "kaledupa": "saya mo smbahea", "indonesia": "saya mau sholat", "english": "I want to pray" }},
-	  "ayo, mari": { "kaledupa": "mai", "indonesia": "ayo, mari", "english": "come on, let's go", "example": { "kaledupa": "mai tointe", "indonesia": "ayo kita pergi", "english": "come on, let’s go" }},
-	  "perut": { "kaledupa": "kompo", "indonesia": "perut", "english": "belly", "example": { "kaledupa": "komposu no ollu", "indonesia": "perut ini nyeri", "english": "this belly is in pain" }},
-	  "nonton": { "kaledupa": "ita–ita", "indonesia": "nonton", "english": "watch", "example": { "kaledupa": "ita–ita te felem", "indonesia": "nonton film", "english": "watch a movie" }},
-	  "film": { "kaledupa": "felem", "indonesia": "film", "english": "film", "example": { "kaledupa": "felem ana leama", "indonesia": "film ini seru", "english": "this film is exciting" }},
-	  "mandi": { "kaledupa": "hesofui", "indonesia": "mandi", "english": "bathe", "example": { "kaledupa": "saya mo hesofui", "indonesia": "saya mau mandi", "english": "I want to bathe" }},
-	  "mengantuk": { "kaledupa": "motuturu", "indonesia": "mengantuk", "english": "sleepy", "example": { "kaledupa": "yaku motuturu", "indonesia": "saya mengantuk", "english": "I’m sleepy" }},
-	  "pelan-pelan": { "kaledupa": "pia–pia", "indonesia": "pelan-pelan", "english": "slowly", "example": { "kaledupa": "fila pia–pia", "indonesia": "jalan pelan-pelan", "english": "walk slowly" }},
-	  "anak": { "kaledupa": "dhai dana", "indonesia": "anak", "english": "child", "example": {"kaledupa": "dhai dana pintar", "indonesia": "anak pintar", "english": "smart child"} }
-	}
+            "air": { "kaledupa": "tee", "indonesia": "air", "english": "water", "example": {"kaledupa": "Ia morou tee.", "indonesia": "Dia minum air.", "english": "He drinks water."} },
+            "ambil": { "kaledupa": "ala e", "indonesia": "ambil", "english": "take", "example": {"kaledupa": "ala e bokussu", "indonesia": "ambil bukuku", "english": "take my book"} },
+            "anak": { "kaledupa": "dhai dana", "indonesia": "anak", "english": "child", "example": {"kaledupa": "dhai dana pintar", "indonesia": "anak pintar", "english": "smart child"} },
+            "apa": { "kaledupa": "paira", "indonesia": "apa", "english": "what", "example": {"kaledupa": "te paira na ana", "indonesia": "apa ini", "english": "what is this?"} },
+            "ayah": { "kaledupa": "bapa", "indonesia": "ayah", "english": "father", "example": {"kaledupa": "bapa karajaa", "indonesia": "ayah bekerja", "english": "father is working"} },
+            "baca": { "kaledupa": "basa", "indonesia": "baca", "english": "read", "example": {"kaledupa": "ia no basa te surat", "indonesia": "dia baca surat", "english": "he/she reads a letter"} },
+            "bagaimana": { "kaledupa": "toumpa", "indonesia": "bagaimana", "english": "how", "example": {"kaledupa": "toumpa na nguru u?", "indonesia": "bagaimana kabarmu?", "english": "how are you?"} },
+            "bangun": { "kaledupa": "bangu", "indonesia": "bangun", "english": "wake up / build", "example": {"kaledupa": "ikoo bangu rea-rea", "indonesia": "kamu bangun pagi", "english": "you wake up early"} },
+            "bekerja": { "kaledupa": "karajaa", "indonesia": "bekerja", "english": "work", "example": {"kaledupa": "ikami karajaa dhi kantoro", "indonesia": "kami bekerja di kantor", "english": "we work at the office"} },
+            "belajar": { "kaledupa": "hena-henai", "indonesia": "belajar", "english": "study", "example": {"kaledupa": "te ammai hena-henai dhi sikolaa", "indonesia": "mereka belajar di sekolah", "english": "they study at school"} },
+            "beli": { "kaledupa": "bhalu", "indonesia": "beli", "english": "buy", "example": {"kaledupa": "mama bhalu te sayuro", "indonesia": "ibu beli sayur", "english": "mother buys vegetables"} },
+            "berapa": { "kaledupa": "sapaira", "indonesia": "berapa", "english": "how many / how much", "example": {"kaledupa": "sapaira na hargano na ana", "indonesia": "berapa harganya ini", "english": "how much is this?"} },
+            "berdiri": { "kaledupa": "tadhe", "indonesia": "berdiri", "english": "stand", "example": {"kaledupa": "te ia no tadhe dhi aro", "indonesia": "dia berdiri di depan", "english": "he/she stands in front"} },
+            "bicara": { "kaledupa": "bisara", "indonesia": "bicara", "english": "talk", "example": {"kaledupa": "alimo barhu bisara tooge", "indonesia": "jangan bicara keras", "english": "don't talk loudly"} },
+            "bisa": { "kaledupa": "pooli", "indonesia": "bisa", "english": "can", "example": {"kaledupa": "yaku pooli nu mangu", "indonesia": "saya bisa berenang", "english": "i can swim"} },
+            "buka": { "kaledupa": "leka", "indonesia": "buka", "english": "open", "example": {"kaledupa": "leka e na eloppo!", "indonesia": "buka pintu!", "english": "open the door!"} },
+            "buku": { "kaledupa": "boku", "indonesia": "buku", "english": "book", "example": {"kaledupa": "te boku fo ou", "indonesia": "buku baru", "english": "new book"} },
+            "bulan": { "kaledupa": "komba", "indonesia": "bulan", "english": "month", "example": {"kaledupa": "komba ompulu lolima", "indonesia": "bulan purnama", "english": "full moon"} },
+            "cari": { "kaledupa": "laha", "indonesia": "cari", "english": "search", "example": {"kaledupa": "yaku laha t ufa", "indonesia": "saya cari uang", "english": "i search for money"} },
+            "cuci": { "kaledupa": "fufu i", "indonesia": "cuci", "english": "wash", "example": {"kaledupa": "te iyai no fufu i te pakaia", "indonesia": "adik cuci pakaian", "english": "younger sibling washes clothes"} },
+            "dapur": { "kaledupa": "daporo", "indonesia": "dapur", "english": "kitchen", "example": {"kaledupa": "te fa mama dhi daporo", "indonesia": "ibu di dapur", "english": "mother is in the kitchen"} },
+            "datang": { "kaledupa": "mai", "indonesia": "datang", "english": "come", "example": {"kaledupa": "ia no mai dhi nga fi", "indonesia": "dia datang kemari", "english": "he/she comes here"} },
+            "dia": { "kaledupa": "ia", "indonesia": "dia", "english": "he/she", "example": {"kaledupa": "te ia no poilukko", "indonesia": "dia suka kamu", "english": "he/she likes you"} },
+            "duduk": { "kaledupa": "kedheng-khede", "indonesia": "duduk", "english": "sit", "example": {"kaledupa": "kedhe dhi kurusi", "indonesia": "silakan duduk di kursi", "english": "please sit on the chair"} },
+            "hari": { "kaledupa": "moina", "indonesia": "hari", "english": "day", "example": {"kaledupa": "moina cerah", "indonesia": "hari cerah", "english": "sunny day"} },
+            "harus": { "kaledupa": "tabhea", "indonesia": "harus", "english": "must", "example": {"kaledupa": "ikoo tabhea ko hena-henai", "indonesia": "kamu harus belajar", "english": "you must study"} },
+            "hidung": { "kaledupa": "bhobho", "indonesia": "hidung", "english": "nose", "example": {"kaledupa": "bhobho mentui", "indonesia": "hidung mancung", "english": "pointed nose"} },
+            "ibu": { "kaledupa": "mama", "indonesia": "ibu", "english": "mother", "example": {"kaledupa": "fa mama hetaahu", "indonesia": "ibu masak", "english": "mother cooks"} },
+            "ingin": { "kaledupa": "hadha", "indonesia": "ingin", "english": "want", "example": {"kaledupa": "yaku hadha manga", "indonesia": "saya ingin makan", "english": "i want to eat"} },
+            "jalan": { "kaledupa": "fila", "indonesia": "jalan", "english": "road / walk", "example": {"kaledupa": "ikita fila asa-asa", "indonesia": "kita jalan bersama", "english": "we walk together"} },
+            "jam": { "kaledupa": "rambi", "indonesia": "jam", "english": "hour", "example": {"kaledupa": "rambi lolima", "indonesia": "jam lima", "english": "five o'clock"} },
+            "jendela": { "kaledupa": "kabhalo bhalo", "indonesia": "jendela", "english": "window", "example": {"kaledupa": "bantoe na kabhalo bhalo", "indonesia": "tutup jendela", "english": "close the window"} },
+            "jual": { "kaledupa": "paraaso", "indonesia": "jual", "english": "sell", "example": {"kaledupa": "la bapa no paraaso te motoro", "indonesia": "ayah jual motor", "english": "father sells a motorcycle"} },
+            "kakak": { "kaledupa": "ikakaa", "indonesia": "kakak", "english": "older sibling", "example": {"kaledupa": "ikakaa fofine", "indonesia": "kakak perempuan", "english": "older sister"} },
+            "kakek": { "kaledupa": "ompu moane", "indonesia": "kakek", "english": "grandfather", "example": {"kaledupa": "ompu moane moturu", "indonesia": "kakek tidur", "english": "grandfather is sleeping"} },
+            "kaki": { "kaledupa": "ae", "indonesia": "kaki", "english": "leg", "example": {"kaledupa": "ae mo hii", "indonesia": "kaki kiri", "english": "left leg"} },
+            "kamar": { "kaledupa": "kamara", "indonesia": "kamar", "english": "room", "example": {"kaledupa": "kamara moturu tooge", "indonesia": "kamar tidur besar", "english": "big bedroom"} },
+            "kamar mandi": { "kaledupa": "kammara hesofui", "indonesia": "kamar mandi", "english": "bathroom", "example": {"kaledupa": "kammara hesofui barasii", "indonesia": "kamar mandi bersih", "english": "clean bathroom"} },
+            "kami": { "kaledupa": "ikami", "indonesia": "kami", "english": "we (inclusive)", "example": {"kaledupa": "ikami ko mangamo", "indonesia": "kami sudah makan", "english": "we have eaten"} },
+            "kamu": { "kaledupa": "ikoo, ko", "indonesia": "kamu", "english": "you", "example": {"kaledupa": "ikoo te yee", "indonesia": "kamu siapa", "english": "who are you?"} },
+            "kantor": { "kaledupa": "te kantoro", "indonesia": "kantor", "english": "office", "example": {"kaledupa": "te kantoro no tutu", "indonesia": "kantor tutup", "english": "the office is closed"} },
+            "kapan": { "kaledupa": "kehia", "indonesia": "kapan", "english": "when", "example": {"kaledupa": "kehia ko kumafi", "indonesia": "kapan kamu menikah", "english": "when will you get married?"} },
+            "kasur": { "kaledupa": "kasoro", "indonesia": "kasur", "english": "mattress", "example": {"kaledupa": "kasoro fo ou", "indonesia": "kasur baru", "english": "new mattress"} },
+            "keluarga": { "kaledupa": "tuha", "indonesia": "keluarga", "english": "family", "example": {"kaledupa": "te santuha", "indonesia": "keluarga besar", "english": "big family"} },
+            "kepala": { "kaledupa": "kapala", "indonesia": "kepala", "english": "head", "example": {"kaledupa": "kiki'i na kapala", "indonesia": "kepala sakit", "english": "headache"} },
+            "kirim": { "kaledupa": "kahu", "indonesia": "kirim", "english": "send", "example": {"kaledupa": "kahue na sura ana", "indonesia": "kirim surat ini", "english": "send this letter"} },
+            "kita": { "kaledupa": "ikita", "indonesia": "kita", "english": "we (exclusive)", "example": {"kaledupa": "mai to inte to manga", "indonesia": "ayo kita pergi makan", "english": "let's go eat"} },
+            "komputer": { "kaledupa": "komputere", "indonesia": "komputer", "english": "computer", "example": {"kaledupa": "komputere no dhao", "indonesia": "komputer rusak", "english": "the computer is broken"} },
+            "kursi": { "kaledupa": "kurusi", "indonesia": "kursi", "english": "chair", "example": {"kaledupa": "kedhe dhi kurusi", "indonesia": "silahkan duduk di kursi", "english": "please sit on the chair"} },
+            "lampu": { "kaledupa": "pajamara", "indonesia": "lampu", "english": "lamp", "example": {"kaledupa": "nokata na pajamara", "indonesia": "nyalakan lampu", "english": "turn on the lamp"} },
+            "lari": { "kaledupa": "tinti", "indonesia": "lari", "english": "run", "example": {"kaledupa": "ikoo utinti melassa", "indonesia": "kamu lari cepat", "english": "you run fast"} },
+            "main": { "kaledupa": "aka-aka", "indonesia": "main", "english": "play", "example": {"kaledupa": "dhai dana aka-aka dhi liku", "indonesia": "anak-anak main di luar", "english": "children play outside"} },
+            "makan": { "kaledupa": "manga", "indonesia": "makan", "english": "eat", "example": {"kaledupa": "Ia manga te daporo.", "indonesia": "Dia makan di dapur.", "english": "He eats in the kitchen."} },
+            "makanan": { "kaledupa": "manga", "indonesia": "makanan", "english": "food", "example": {"kaledupa": "manga minna", "indonesia": "makanan enak", "english": "delicious food"} },
+            "malam": { "kaledupa": "utu", "indonesia": "malam", "english": "night", "example": {"kaledupa": "te utu kumengku", "indonesia": "malam dingin", "english": "cold night"} },
+            "mana": { "kaledupa": "kaumpa", "indonesia": "mana", "english": "where", "example": {"kaledupa": "ikoo diumpa", "indonesia": "kamu dimana", "english": "where are you?"} },
+            "masak": { "kaledupa": "hetaahu", "indonesia": "masak", "english": "cook", "example": {"kaledupa": "ikakaa hetaahu te nasi", "indonesia": "kakak masak nasi", "english": "sister cooks rice"} },
+            "mata": { "kaledupa": "mata", "indonesia": "mata", "english": "eye", "example": {"kaledupa": "mata leama, mata mangadha", "indonesia": "mata indah", "english": "beautiful eyes"} },
+            "mau": { "kaledupa": "hadha", "indonesia": "mau", "english": "want", "example": {"kaledupa": "yaku hadha manga", "indonesia": "saya mau makan", "english": "i want to eat"} },
+            "meja": { "kaledupa": "meja", "indonesia": "meja", "english": "table", "example": {"kaledupa": "meja dhi te kantoro", "indonesia": "meja di kantor", "english": "the table is in the office"} },
+            "mengapa": { "kaledupa": "noha a", "indonesia": "mengapa", "english": "why", "example": {"kaledupa": "noha a fadhia u inte?", "indonesia": "mengapa kamu pergi?", "english": "why did you go?"} },
+            "menit": { "kaledupa": "manii", "indonesia": "menit", "english": "minute", "example": {"kaledupa": "lima monitti", "indonesia": "lima menit", "english": "five minutes"} },
+            "mereka": { "kaledupa": "te ammai", "indonesia": "mereka", "english": "they", "example": {"kaledupa": "te ammai inte dha dhaoa", "indonesia": "mereka pergi ke pasar", "english": "they went to the market"} },
+            "minum": { "kaledupa": "morou", "indonesia": "minum", "english": "drink", "example": {"kaledupa": "ikoo umorou te paira?", "indonesia": "kamu minum apa?", "english": "what are you drinking?"} },
+            "minuman": { "kaledupa": "morou", "indonesia": "minuman", "english": "drink (beverage)", "example": {"kaledupa": "te morou kumengku", "indonesia": "minuman dingin", "english": "cold drink"} },
+            "mobil": { "kaledupa": "oto", "indonesia": "mobil", "english": "car", "example": {"kaledupa": "mai to ekka dhi oto", "indonesia": "ayo kita naik mobil", "english": "let's take the car"} },
+            "motor": { "kaledupa": "motoro", "indonesia": "motor", "english": "motorcycle", "example": {"kaledupa": "motoro la bapa", "indonesia": "motor ayah", "english": "father's motorcycle"} },
+            "nenek": { "kaledupa": "ompu fofine", "indonesia": "nenek", "english": "grandmother", "example": {"kaledupa": "ompu fofine no tula-tula", "indonesia": "nenek bercerita", "english": "grandmother is telling a story"} },
+            "obat": { "kaledupa": "kombi", "indonesia": "obat", "english": "medicine", "example": {"kaledupa": "kombi manjuru", "indonesia": "obat mujarab", "english": "effective medicine"} },
+            "pagi": { "kaledupa": "rea-rea", "indonesia": "pagi", "english": "morning", "example": {"kaledupa": "dhi rea-rea", "indonesia": "pagi hari", "english": "morning time"} },
+            "pakai": { "kaledupa": "pake", "indonesia": "pakai", "english": "wear", "example": {"kaledupa": "yaku pake sapatu", "indonesia": "saya pakai sepatu", "english": "i wear shoes"} },
+            "pakaian": { "kaledupa": "pakaia", "indonesia": "pakaian", "english": "clothes", "example": {"kaledupa": "pakea leama", "indonesia": "pakaian bagus", "english": "nice clothes"} },
+            "panggil": { "kaledupa": "ello", "indonesia": "panggil", "english": "call", "example": {"kaledupa": "ello na dottoro", "indonesia": "panggil dokter!", "english": "call the doctor!"} },
+            "pasar": { "kaledupa": "dhaoa", "indonesia": "pasar", "english": "market", "example": {"kaledupa": "inte dha dhaoa", "indonesia": "pergi ke pasar", "english": "go to the market"} },
+            "pergi": { "kaledupa": "inte", "indonesia": "pergi", "english": "go", "example": {"kaledupa": "yaku inte dha sikolaa", "indonesia": "saya pergi ke sekolah", "english": "i go to school"} },
+            "perlu": { "kaledupa": "faralu", "indonesia": "perlu", "english": "need", "example": {"kaledupa": "ikita to faralu te ufa", "indonesia": "kita perlu uang", "english": "we need money"} },
+            "pintu": { "kaledupa": "eloppo", "indonesia": "pintu", "english": "door", "example": {"kaledupa": "eloppo sapo merah", "indonesia": "pintu rumah merah", "english": "the door of the red house"} },
+            "pulpen": { "kaledupa": "folopena", "indonesia": "pulpen", "english": "pen", "example": {"kaledupa": "folopena no tokkabhi", "indonesia": "pulpen hilang", "english": "the pen is lost"} },
+            "rumah": { "kaledupa": "sapo", "indonesia": "rumah", "english": "house", "example": {"kaledupa": "te sapo ye'e na ana", "indonesia": "ini rumah siapa", "english": "whose house is this?"} },
+            "saudara": { "kaledupa": "te tuha", "indonesia": "saudara", "english": "sibling", "example": {"kaledupa": "te tuha moane", "indonesia": "saudara laki-laki", "english": "male sibling"} },
+            "saya": { "kaledupa": "yaku, ku", "indonesia": "saya", "english": "I", "example": {"kaledupa": "yaku la joko", "indonesia": "saya joko", "english": "I'm joko"} },
+            "sekolah": { "kaledupa": "sikolaa", "indonesia": "sekolah", "english": "school", "example": {"kaledupa": "sikolaa mellai", "indonesia": "sekolah jauh", "english": "the school is far"} },
+            "sepatu": { "kaledupa": "sapatu", "indonesia": "sepatu", "english": "shoes", "example": {"kaledupa": "te sapatussu rafna bhiru", "indonesia": "sepatuku warna hitam", "english": "my shoes are black"} },
+            "sepeda": { "kaledupa": "supeda", "indonesia": "sepeda", "english": "bicycle", "example": {"kaledupa": "supeda foou", "indonesia": "sepeda baru", "english": "new bicycle"} },
+            "siang": { "kaledupa": "tobelenu oloo", "indonesia": "siang", "english": "afternoon", "example": {"kaledupa": "tobelenu oloo", "indonesia": "siang panas", "english": "hot afternoon"} },
+            "siapa": { "kaledupa": "ye e", "indonesia": "siapa", "english": "who", "example": {"kaledupa": "ye e na ngaa u", "indonesia": "siapa namamu", "english": "what is your name?"} },
+            "tahun": { "kaledupa": "tao", "indonesia": "tahun", "english": "year", "example": {"kaledupa": "tao foou", "indonesia": "tahun baru", "english": "new year"} },
+            "tangan": { "kaledupa": "lima", "indonesia": "tangan", "english": "hand", "example": {"kaledupa": "lima moana", "indonesia": "tangan kanan", "english": "right hand"} },
+            "tanggal": { "kaledupa": "tanggala", "indonesia": "tanggal", "english": "date", "example": {"kaledupa": "tanggala popia ?", "indonesia": "tanggal berapa?", "english": "what date?"} },
+            "tas": { "kaledupa": "tas", "indonesia": "tas", "english": "bag", "example": {"kaledupa": "tasi fa mama", "indonesia": "tas ibu", "english": "mother's bag"} },
+            "telepon": { "kaledupa": "talipo", "indonesia": "telepon", "english": "phone", "example": {"kaledupa": "talipo notanga", "indonesia": "telepon berdering", "english": "the phone is ringing"} },
+            "telinga": { "kaledupa": "talinga", "indonesia": "telinga", "english": "ear", "example": {"kaledupa": "talinga no rodhongo", "indonesia": "telinga mendengar", "english": "the ear listens"} },
+            "tidur": { "kaledupa": "moturu", "indonesia": "tidur", "english": "sleep", "example": {"kaledupa": "yaku moturu dhi kasoro", "indonesia": "saya tidur di kasur", "english": "i sleep on the mattress"} },
+            "toko": { "kaledupa": "te toko", "indonesia": "toko", "english": "store", "example": {"kaledupa": "te toko no leka", "indonesia": "toko buka", "english": "the store is open"} },
+            "tulis": { "kaledupa": "buri", "indonesia": "tulis", "english": "write", "example": {"kaledupa": "yaku buri te boku", "indonesia": "saya tulis buku", "english": "i write a book"} },
+            "tutup": { "kaledupa": "banto", "indonesia": "tutup", "english": "close", "example": {"kaledupa": "bantoe na kabhalo bhalo", "indonesia": "tutup jendela", "english": "close the window"} },
+            "uang": { "kaledupa": "ufa", "indonesia": "uang", "english": "money", "example": {"kaledupa": "ufa nodhai", "indonesia": "uang cukup", "english": "enough money"} },
+            "waktu": { "kaledupa": "fakutuu", "indonesia": "waktu", "english": "time", "example": {"kaledupa": "fakutuu fila torusu", "indonesia": "waktu berjalan", "english": "time moves forward"} },
+            "cinta": { "kaledupa": "poilu", "indonesia": "cinta", "english": "love", "example": {"kaledupa": "yaku ku poilukko", "indonesia": "saya cinta kamu", "english": "i love you"} },
+            "mulut": {"indonesia": "mulut", "kaledupa": "ngusu", "english": "mouth", "example": {"indonesia": "dia menutup mulutnya.", "kaledupa": "no bantoe na ngusu-no.", "english": "he closed his mouth."}},
+            "sapi": {"indonesia": "sapi", "kaledupa": "te sapi", "english": "cow", "example": {"indonesia": "sapi itu besar.", "kaledupa": "te sapi itu deka.", "english": "that cow is big."}},
+            "ikan": {"indonesia": "ikan", "kaledupa": "te kenta", "english": "fish", "example": {"indonesia": "aku menangkap ikan.", "kaledupa": "yaku afa te kenta.", "english": "i caught a fish."}},
+            "ular": {"indonesia": "ular", "kaledupa": "te saa", "english": "snake", "example": {"indonesia": "ada ular di kebun.", "kaledupa": "anne na saa di kollo.", "english": "there is a snake in the garden."}},
+            "kupu-kupu": {"indonesia": "kupu-kupu", "kaledupa": "loma", "english": "butterfly", "example": {"indonesia": "kupu-kupu itu cantik.", "kaledupa": "loma iso mokossa.", "english": "the butterfly is beautiful."}},
+            "telur": {"indonesia": "telur", "kaledupa": "gorau", "english": "egg", "example": {"indonesia": "ayam bertelur di sarang.", "kaledupa": "te manu manggorau di saranga.", "english": "the hen lays eggs in the nest."}},
+            "sayur": {"indonesia": "sayur", "kaledupa": "sayoro", "english": "vegetable", "example": {"indonesia": "saya makan sayur hijau.", "kaledupa": "yaku manga sayoro ndanggo.", "english": "i eat green vegetables."}},
+            "seribu": {"indonesia": "seribu", "kaledupa": "sarifu", "english": "one thousand", "example": {"indonesia": "harga barang itu seribu rupiah.", "kaledupa": "te hargana barang iso sarifu rupia.", "english": "the price of that item is one thousand rupiahs."}},
+            "dua ribu": {"indonesia": "dua ribu", "kaledupa": "dua rifu", "english": "two thousand", "example": {"indonesia": "dia membayar dua ribu rupiah.", "kaledupa": "no afia dua rifu rupia.", "english": "he paid two thousand rupiahs."}},
+            "tiga ribu": {"indonesia": "tiga ribu", "kaledupa": "tolu rifu", "english": "three thousand", "example": {"indonesia": "tiga ribu cukup untuk membeli kopi.", "kaledupa": "tolu rifu afe morou te kopi.", "english": "three thousand is enough to buy coffee."}},
+            "satu juta": {"indonesia": "satu juta", "kaledupa": "sajuta", "english": "one million", "example": {"indonesia": "hadiah itu bernilai satu juta rupiah.", "kaledupa": "te hadia iso sajuta rupia.", "english": "that prize is worth one million rupiahs."}},
+            "daging": {"indonesia": "daging", "kaledupa": "te dagi", "english": "meat", "example": {"indonesia": "saya memasak daging sapi.", "kaledupa": "yaku manga te dagi sapi.", "english": "i cook beef."}},
+            "sholat": {"indonesia": "sholat", "kaledupa": "sambahea", "english": "prayer", "example": {"indonesia": "dia sholat lima waktu.", "kaledupa": "no sambahea lima kali.", "english": "he prays five times a day."}},
+            "cerita-cerita": {"indonesia": "cerita-cerita", "kaledupa": "palaenga", "english": "stories", "example": {"indonesia": "kakek suka cerita-cerita.", "kaledupa": "te yai suka palaenga.", "english": "grandfather likes to tell stories."}},
+            "rokok": {"indonesia": "rokok", "kaledupa": "tabako", "english": "cigarette", "example": {"indonesia": "dia membeli rokok.", "kaledupa": "no afa tabako.", "english": "he bought a cigarette."}},
+            "kopi": {"indonesia": "kopi", "kaledupa": "te kopi", "english": "coffee", "example": {"indonesia": "saya minum kopi pagi ini.", "kaledupa": "yaku morou te kopi iso madaha.", "english": "i drank coffee this morning."}},
+            "asap": {"indonesia": "asap", "kaledupa": "ko o", "english": "smoke", "example": {"indonesia": "asap naik ke udara.", "kaledupa": "ko o a'e ko awanga.", "english": "the smoke rises into the air."}},
+            "api": {"indonesia": "api", "kaledupa": "te ahu", "english": "fire", "example": {"indonesia": "api itu menyala.", "kaledupa": "te ahu itu mantana.", "english": "the fire is burning."}},
+            "korek": {"indonesia": "korek", "kaledupa": "te colo", "english": "match", "example": {"indonesia": "saya menyalakan korek.", "kaledupa": "yaku pakata te colo.", "english": "i lit a match."}},
+            "bulu": { "kaledupa": "fulu", "indonesia": "bulu", "english": "feather", "example": { "kaledupa": "fulu no paka nomelangka", "indonesia": "bulunya tidak panjang", "english": "the feather isn’t long" }},
+            "kuku": { "kaledupa": "kuku", "indonesia": "kuku", "english": "nail", "example": { "kaledupa": "kuku no barasii", "indonesia": "kukunya bersih", "english": "the nail is clean" }},
+            "lutut": { "kaledupa": "tu'u", "indonesia": "lutut", "english": "knee", "example": { "kaledupa": "tu'u ana kikii", "indonesia": "lutut ini sakit", "english": "this knee hurts" }},
+            "tumit": { "kaledupa": "tuno", "indonesia": "tumit", "english": "heel", "example": { "kaledupa": "tuno ana notokkuli", "indonesia": "tumit ini lecet", "english": "this heel is scraped" }},
+            "ibu jari": { "kaledupa": "fungan tooge", "indonesia": "ibu jari", "english": "thumb", "example": { "kaledupa": "fungan tooge no tooge", "indonesia": "ibu jari ini besar", "english": "this thumb is big" }},
+            "jari telunjuk": { "kaledupa": "funga sinnua", "indonesia": "jari telunjuk", "english": "index finger", "example": { "kaledupa": "funga sinnua melangka", "indonesia": "jari telunjuk ini panjang", "english": "this index finger is long" }},
+            "jari tengah": { "kaledupa": "fungan tonga", "indonesia": "jari tengah", "english": "middle finger", "example": { "kaledupa": "fungan tonga nomobela", "indonesia": "jari tengah ini luka", "english": "this middle finger is wounded" }},
+            "jari manis": { "kaledupa": "funga kela", "indonesia": "jari manis", "english": "ring finger", "example": { "kaledupa": "funga kela umalusu", "indonesia": "jari manis ini halus", "english": "this ring finger is smooth" }},
+            "jari kelingking": { "kaledupa": "fungansili", "indonesia": "jari kelingking", "english": "pinky finger", "example": { "kaledupa": "fungansili bahili", "indonesia": "jari kelingking ini kecil", "english": "this pinky is small" }},
+            "jenggot": { "kaledupa": "janggu", "indonesia": "jenggot", "english": "beard", "example": { "kaledupa": "janggu melangka", "indonesia": "jenggotnya panjang", "english": "the beard is long" }},
+            "kumis": { "kaledupa": "kummisi", "indonesia": "kumis", "english": "mustache", "example": { "kaledupa": "kummisi monihi", "indonesia": "kumisnya tipis", "english": "the mustache is thin" }},
+            "ayo, mari": { "kaledupa": "mai", "indonesia": "ayo, mari", "english": "come on, let's go", "example": { "kaledupa": "mai tointe", "indonesia": "ayo kita pergi", "english": "come on, let’s go" }},
+            "perut": { "kaledupa": "kompo", "indonesia": "perut", "english": "belly", "example": { "kaledupa": "komposu no ollu", "indonesia": "perut ini nyeri", "english": "this belly is in pain" }},
+            "nonton": { "kaledupa": "ita–ita", "indonesia": "nonton", "english": "watch", "example": { "kaledupa": "ita–ita te felem", "indonesia": "nonton film", "english": "watch a movie" }},
+            "film": { "kaledupa": "felem", "indonesia": "film", "english": "film", "example": { "kaledupa": "felem ana leama", "indonesia": "film ini seru", "english": "this film is exciting" }},
+            "mandi": { "kaledupa": "hesofui", "indonesia": "mandi", "english": "bathe", "example": { "kaledupa": "saya mo hesofui", "indonesia": "saya mau mandi", "english": "I want to bathe" }},
+            "mengantuk": { "kaledupa": "motuturu", "indonesia": "mengantuk", "english": "sleepy", "example": { "kaledupa": "yaku motuturu", "indonesia": "saya mengantuk", "english": "I’m sleepy" }},
+            "pelan-pelan": { "kaledupa": "pia–pia", "indonesia": "pelan-pelan", "english": "slowly", "example": { "kaledupa": "fila pia–pia", "indonesia": "jalan pelan-pelan", "english": "walk slowly" }}
+        };
 
         function translateWord() {
-            let word = document.getElementById("wordInput").value.toLowerCase();
+            let word = document.getElementById("wordInput").value.toLowerCase().trim();
             let resultDiv = document.getElementById("translationResult");
             let found = false;
             
+            if (word === "") {
+                resultDiv.innerHTML = "Silakan masukkan kata terlebih dahulu.";
+                return;
+            }
+
             for (let key in dictionary) {
                 let entry = dictionary[key];
-                if (word === key || word === entry.kaledupa || word === entry.indonesia || word === entry.english.toLowerCase()) {
+                if (word === key.toLowerCase() || word === entry.kaledupa.toLowerCase() || word === entry.indonesia.toLowerCase() || word === entry.english.toLowerCase()) {
                     resultDiv.innerHTML = `
                         <b>Kaledupa:</b> ${entry.kaledupa} <br>
                         <b>Indonesia:</b> ${entry.indonesia} <br>
